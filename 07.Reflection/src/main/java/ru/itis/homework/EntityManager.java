@@ -115,40 +115,6 @@ public class EntityManager {
     }
 
     public <T, ID extends Number> T findById(String tableName, Class<T> resultType, Class<ID> idType, ID idValue) {
-        String sql = String.format("select * from %s where id = %s", tableName, idValue);
 
-        Field[] f = resultType.getDeclaredFields();
-        Class<?>[] types = new Class<?>[f.length];
-
-        for (int i = 0; i < f.length; i++) {
-            types[i] = f[i].getType();
-        }
-
-        Object[] variables = new Object[f.length];
-
-        try {
-            try (Connection connection = dataSource.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                ResultSet resultSet = preparedStatement.executeQuery();
-
-                Field[] fields = resultType.getDeclaredFields();
-                if (resultSet.next()) {
-                    for (int i = 0; i < fields.length; i++) {
-                        variables[i] = resultSet.getObject(i + 1);
-                    }
-                }
-                System.out.println(Arrays.toString(variables));
-            }
-
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
-        try {
-            Constructor<?> constructor = resultType.getConstructor(types);
-            Object object = constructor.newInstance(variables);
-            return (T) object;
-        } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 }
